@@ -8,7 +8,7 @@
 #include <avr/io.h>
 #define FOSC 8000000
 #define BAUD 9600
-#define MYUBRR ((FOSC/(16*BAUD))-1)
+#define MYUBRR ((FOSC/(16UL*BAUD))-1)
 
 void init(void){
 	/* Set baud rate */
