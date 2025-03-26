@@ -24,10 +24,10 @@ typedef struct {
 	int counter;
 } Handler;
 
-void readValue(Handler *self, int value);
-void reduceBridge(Handler *self);
-void switcher (Handler *self);
-void updateDisplay(Handler *self);
+int readValue(Handler *self, int value);
+int reduceBridge(Handler *self);
+int switcher (Handler *self);
+int updateDisplay(Handler *self);
 
 #define initHandler(com, lcd) {initObject(), com, lcd, 1, 0, 0, 0, 0}
 

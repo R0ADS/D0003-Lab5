@@ -12,18 +12,18 @@
 Msg test;
 Msg teste;
 
-void updateDisplay(Handler *self) {
+int updateDisplay(Handler *self) {
 	ASYNC(self->lcd, printAt, self->northQueue * 10);
 	ASYNC(self->lcd, printAt, self->onBridge * 10 + 2);
 	ASYNC(self->lcd, printAt, self->southQueue * 10 + 4);
 }
 
-void reduceBridge(Handler *self) {
+int reduceBridge(Handler *self) {
 	self->onBridge--;
 	ASYNC(self, updateDisplay, NULL);
 }
 
-void readValue(Handler *self, int value) {
+int readValue(Handler *self, int value) {
 	if (value == 1) {			// If a car enters northQueue
 		self->northQueue++;
 	}
@@ -44,7 +44,7 @@ void readValue(Handler *self, int value) {
 	ASYNC(self, switcher, NULL);
 }
 
-void switcher (Handler *self) {
+int switcher (Handler *self) {
 	if (self->isNorth) {
 		if (self->northQueue && self->counter < 5) {			// I added the check with (if other queue > 5 switch queue if bridge is currently empty)
 			self->counter++;
@@ -52,15 +52,15 @@ void switcher (Handler *self) {
 		}
 		else {
 			if ((self->southQueue && self->onBridge == 0) || (self->onBridge == 0 && self->counter >= 5)) {
-				self->counter = 0;
+				self->counter = 1;
 				self->isNorth = 0;
 				ASYNC(self->com, transmit, 0b0110);		// Green south
 			}
 			else {
-				if (teste) {
-					ABORT(teste);
+				if (test) {
+					ABORT(test);
 				}
-				teste = AFTER(MSEC(5000), self, switcher, NULL);	// Confuse
+				test = AFTER(MSEC(200), self, switcher, NULL);	// Confuse 
 			}
 		}
 	}
@@ -71,7 +71,7 @@ void switcher (Handler *self) {
 		}
 		else {
 			if ((self->northQueue && self->onBridge == 0) || (self->onBridge == 0 && self->counter >= 5)) {
-				self->counter = 0;
+				self->counter = 1;
 				self->isNorth = 1;
 				ASYNC(self->com, transmit, 0b1001);		// Green north
 			}
@@ -79,7 +79,7 @@ void switcher (Handler *self) {
 				if (test) {
 					ABORT(test);
 				}
-				test = AFTER(MSEC(5000), self, switcher, NULL);
+				test = AFTER(MSEC(200), self, switcher, NULL);
 			}
 		}
 	}
