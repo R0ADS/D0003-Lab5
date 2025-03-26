@@ -10,6 +10,8 @@
 #define HANDLER_H_
 
 #include "TinyTimber.h"
+#include "Communication.h"
+#include "Lcd.h"
 
 typedef struct {
 	Object super;
@@ -19,8 +21,14 @@ typedef struct {
 	int southQueue;
 	int northQueue;
 	int onBridge;
+	int counter;
 } Handler;
 
-#define initHandler(com, lcd) {initObject(), com, lcd, 1, 0, 0, 0}
+void readValue(Handler *self, int value);
+void reduceBridge(Handler *self);
+void switcher (Handler *self);
+void updateDisplay(Handler *self);
+
+#define initHandler(com, lcd) {initObject(), com, lcd, 1, 0, 0, 0, 0}
 
 #endif /* HANDLER_H_ */

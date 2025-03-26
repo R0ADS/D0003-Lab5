@@ -5,6 +5,8 @@
  *  Author: albin
  */ 
 
+#include <stdint.h>
+
 #ifndef COMMUNICATION_H_
 #define COMMUNICATION_H_
 
@@ -16,8 +18,6 @@ typedef struct {
 
 #define initCommunication() {initObject()}
 
-uint8_t receive(void);
-
-uint8_t transmit(uint8_t data);
+int transmit(Communication *self, int data);
 
 #endif /* COMMUNICATION_H_ */

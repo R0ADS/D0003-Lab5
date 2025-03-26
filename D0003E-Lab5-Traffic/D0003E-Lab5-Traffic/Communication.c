@@ -8,15 +8,7 @@
 #include <avr/io.h>
 #include "Communication.h"
 
-uint8_t receive(void){
-	
-	/* Wait for data to be received */
-	while ( !(UCSR0A & (1<<RXC0)) );
-	/* Return said data from buffer */
-	return UDR0;
-}
-
-uint8_t transmit(uint8_t data){
+int transmit(Communication *self, int data){
 	while ( !(UCSR0A & (1<<UDRE0)) );
 	UDR0 = data;
 }

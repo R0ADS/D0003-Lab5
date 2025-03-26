@@ -11,19 +11,16 @@
 #include "Communication.h"
 #include "Lcd.h"
 #include "TinyTimber.h"
+#include "InterruptHandler.h"
 
 int main(void)
 {
-	int southQueue = 0;
-	int northQueue = 0;
-	int southBridge = 0;
-	int northBridge = 0;
-	int isNorth = 1;
-	
     Init();
 	Lcd lcd = initLcd();
-	Communication com = initCommuncation();
-	Handler handler = initHandler(&com, &display);
-	
+	Communication com = initCommunication();
+	Handler handler = initHandler(&com, &lcd);
+	InterruptHandler interruptHandler = initInterruptHandler(&handler);
+	INSTALL(&interruptHandler, interrupter, IRQ_USART0_RX);
+	return tinytimber(NULL, NULL, NULL);
 }
 
