@@ -386,7 +386,7 @@ int switcher (Handler *self) {
 					ABORT(test);
      254:	0e 94 b3 0f 	call	0x1f66	; 0x1f66 <ABORT>
 				}
-				test = AFTER(MSEC(2000), self, switcher, NULL);	// NOTE: time needs to be above 1 second to be sure that the update has happend
+				test = AFTER(MSEC(1250), self, switcher, NULL);	// NOTE: time needs to be above 1 second to be sure that the update has happend
      258:	c1 2c       	mov	r12, r1
      25a:	d1 2c       	mov	r13, r1
      25c:	88 e0       	ldi	r24, 0x08	; 8
@@ -397,8 +397,8 @@ int switcher (Handler *self) {
      266:	20 e0       	ldi	r18, 0x00	; 0
      268:	30 e0       	ldi	r19, 0x00	; 0
      26a:	a9 01       	movw	r20, r18
-     26c:	64 e2       	ldi	r22, 0x24	; 36
-     26e:	74 ef       	ldi	r23, 0xF4	; 244
+     26c:	66 e9       	ldi	r22, 0x96	; 150
+     26e:	78 e9       	ldi	r23, 0x98	; 152
      270:	80 e0       	ldi	r24, 0x00	; 0
      272:	90 e0       	ldi	r25, 0x00	; 0
      274:	0e 94 46 0d 	call	0x1a8c	; 0x1a8c <async>
@@ -417,7 +417,7 @@ int switcher (Handler *self) {
      28c:	df 90       	pop	r13
      28e:	cf 90       	pop	r12
      290:	08 95       	ret
-				test = AFTER(MSEC(2000), self, switcher, NULL);	// NOTE: time needs to be above 1 second to be sure that the update has happend
+				test = AFTER(MSEC(1250), self, switcher, NULL);	// NOTE: time needs to be above 1 second to be sure that the update has happend
 			}
 		}
 	}
@@ -471,7 +471,7 @@ int switcher (Handler *self) {
      2d6:	cb 01       	movw	r24, r22
      2d8:	0e 94 46 0d 	call	0x1a8c	; 0x1a8c <async>
      2dc:	d1 cf       	rjmp	.-94     	; 0x280 <switcher+0x70>
-				test = AFTER(MSEC(2000), self, switcher, NULL);	// NOTE: time needs to be above 1 second to be sure that the update has happend
+				test = AFTER(MSEC(1250), self, switcher, NULL);	// NOTE: time needs to be above 1 second to be sure that the update has happend
 			}
 		}
 	}
