@@ -34,7 +34,7 @@ int deQueuer(Handler *self, int dir){
 		self->southQueue--;
 	}
 	self->onBridge++;
-	ASYNC(self, updateDisplay, NULL);	// <-- Unnecessary line? Should remove and test
+	//ASYNC(self, updateDisplay, NULL);	// <-- Unnecessary line? Should remove and test
 	AFTER(MSEC(5000), self, reduceBridge, NULL);
 }
 
@@ -82,7 +82,7 @@ int switcher (Handler *self) {
 			}
 		}
 	}
-	else if (!(self->isNorth)){ // <-- The if on this line should not be needed since isNorth is either set to 1 or 0.
+	else {
 		if (self->southQueue && self->counter < 5) {
 			ASYNC(self->com, transmit, 0b0110);				// Green south
 		}
