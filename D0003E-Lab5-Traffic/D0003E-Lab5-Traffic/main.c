@@ -13,8 +13,7 @@
 #include "TinyTimber.h"
 #include "InterruptHandler.h"
 
-int main(void)
-{
+int main(void) {
     Init();
 	Lcd lcd = initLcd();
 	Communication com = initCommunication();

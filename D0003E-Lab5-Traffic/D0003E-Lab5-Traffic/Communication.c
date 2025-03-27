@@ -8,7 +8,8 @@
 #include <avr/io.h>
 #include "Communication.h"
 
-int transmit(Communication *self, int data){
+// Sends data to simulator
+int transmit(Communication *self, int data) {
 	while ( !(UCSR0A & (1<<UDRE0)) );
 	UDR0 = data;
 }

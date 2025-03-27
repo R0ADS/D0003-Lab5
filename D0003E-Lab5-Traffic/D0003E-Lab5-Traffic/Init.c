@@ -10,6 +10,7 @@
 #define BAUD 9600
 #define MYUBRR ((FOSC/(16UL*BAUD))-1)
 
+// Just what you woud expect, all things needed for initialization
 void Init(void) {
 	CLKPR = 0x80;    // Fix clock speed
 	CLKPR = 0x00;
