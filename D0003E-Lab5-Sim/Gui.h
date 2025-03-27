@@ -16,7 +16,9 @@ typedef struct {
 #define initGui() {0, 0, 0, 0, 0}
 
 void menu(void *t);
-void theProcess(void *t);
+void theProcess(int serial_port, Gui *sim);
+int inputRead(int serial_port, Gui *sim);
 void handleInput(void *t, uint8_t data);
+void printMe(Gui *sim);
 
 #endif

@@ -6,7 +6,8 @@
 #include "Cummunication.h"
 
 pthread_mutex_t guiMutex; // Lär nog inte behövas
-pthread_t carRemover;
+pthread_t carRemover, theRunner;
+int northQueue = 0, northLight = 0, onBridge = 0, southLight = 0, southQueue = 0;
 
 void *sleepDeprived(void *t){
     Gui *sim = (Gui *)t;
@@ -14,26 +15,50 @@ void *sleepDeprived(void *t){
     pthread_mutex_lock(&guiMutex);
     sim->onBridge--;
     pthread_mutex_unlock(&guiMutex);
+    printMe(sim);
     pthread_exit(NULL);
 }
 
-int inputRead(void *t) {
-    Thread *ts = (Thread*)t;
-    Gui *sim = (Gui *)ts->Sim;
+void printMe(Gui *sim){
+    pthread_mutex_lock(&guiMutex);
+    //on = inputRead(ts->serial_port, sim);
+    if (northQueue != sim->northQueue || 
+        northLight != sim->northLight || 
+        onBridge != sim->onBridge     || 
+        southLight != sim->southLight || 
+        southQueue != sim-> southQueue) {
+        northQueue = sim->northQueue;
+        northLight = sim->northLight;
+        onBridge = sim->onBridge;
+        southLight = sim->southLight;
+        southQueue = sim-> southQueue;
+        printf("%d   %d   %d   %d   %d  \n", sim->northQueue,  sim->northLight, sim->onBridge, sim->southLight, sim->southQueue); 
+        }
+    pthread_mutex_unlock(&guiMutex);
+}
+
+int inputRead(int serial_port, Gui *sim) {
+    uint8_t SOUTH = 0b0100;
+    uint8_t NORTH = 0b0001;
+    /*Thread *ts = (Thread*)t;
+    Gui *sim = (Gui *)ts->Sim;*/
     char input;
     scanf("%c", &input);
     switch (input) {
         case 'n': 
             sim->northQueue++;
-            USART_Transmiter((void *)&(ts->serial_port),(uint8_t) 0b0001);
+            write(serial_port, &NORTH, 1);
             break;
         case 's':
             sim->southQueue++;
-            USART_Transmiter((void *)&(ts->serial_port),(uint8_t) 0b0100);
+            write(serial_port, &SOUTH, 1);
             break;
         case 'e':
             printf("Bridge collapsed...");
             return 0;
+            /*close(ts->serial_port);
+            exit(0);*/
+            
         default:
             break;
     }
@@ -44,39 +69,27 @@ void menu(void *t) {
     int on = 1;
     Thread *ts = (Thread*)t;
     Gui *sim = (Gui *)ts->Sim;
-    int northQueue = 0, northLight = 0, onBridge = 0, southLight = 0, southQueue = 0;
     while (on) {
-        pthread_mutex_lock(&guiMutex);
-        on = inputRead(&ts);
-        if (northQueue != sim->northQueue || 
-            northLight != sim->northLight || 
-            onBridge != sim->onBridge     || 
-            southLight != sim->southLight || 
-            southQueue != sim-> southQueue) {
-            northQueue = sim->northQueue;
-            northLight = sim->northLight;
-            onBridge = sim->onBridge;
-            southLight = sim->southLight;
-            southQueue = sim-> southQueue;
-            printf("%d   %d   %d   %d   %d  \n", sim->northQueue,  sim->northLight, sim->onBridge, sim->southLight, sim->southQueue); 
-        }
-        pthread_mutex_unlock(&guiMutex);
+        on = inputRead(ts->serial_port, sim);
+        printMe(sim);
         sleep(0.1);
     }
 }
 
 // trust
-void theProcess(void *t) {
-    Thread *ts = (Thread*) t;
-    Gui *sim = (Gui*)ts->Sim;
+void theProcess(int serial_port, Gui *sim) {
+    uint8_t NORTHDEQ = 0b0010;
+    uint8_t SOUTHDEQ = 0b1000;
+    /*Thread *ts = (Thread*) t;
+    Gui *sim = (Gui*)ts->Sim;*/
     pthread_mutex_lock(&guiMutex);
-    if (sim->northLight && !(sim->southLight)) {
+    if (sim->northLight && !(sim->southLight) && sim->northQueue) {
         sim->northQueue--;
-        USART_Transmiter((void *)&(ts->serial_port), 0b0010);
+        write(serial_port, &NORTHDEQ, 1);
     }
-    else if (!(sim->northLight) && sim->southLight) {
+    else if (!(sim->northLight) && (sim->southLight) && sim->southQueue) {
         sim->southQueue--;
-        USART_Transmiter((void *)&(ts->serial_port), 0b1000);
+        write(serial_port, &SOUTHDEQ, 1);
     }
     sim->onBridge++;
     pthread_mutex_unlock(&guiMutex);
@@ -100,6 +113,7 @@ void handleInput(void *t, uint8_t data) {
         sim->southLight = 0;
     }
     pthread_mutex_unlock(&guiMutex);
-    theProcess(&t);
+    printMe(sim);
+    theProcess(ts->serial_port, sim);
 }
 

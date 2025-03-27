@@ -12,7 +12,6 @@
 #define initCummunication() {initObject()}
 
 void *USART_Receiver(void *t);
-void handleInput(void *t, uint8_t data);
 void USART_Transmiter(void *t, uint8_t data);
 
 #endif /* COMMUNICATION_H_ */

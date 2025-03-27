@@ -1,5 +1,7 @@
 {
     "files.associations": {
-        "cummunication.h": "c"
+        "cummunication.h": "c",
+        "init.h": "c",
+        "threadstruct.h": "c"
     }
 }

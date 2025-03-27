@@ -14,6 +14,6 @@ typedef struct{
     void *Sim;
 } Thread;
 
-#define initThreadArgs(serialPort, Sims) ((Thread){serialPort, Sims});
+#define initThreadArgs(serialPort, Sims) ((Thread){serialPort, Sims})
 
 #endif /* THREADSTRUCT_H_ */
