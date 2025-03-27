@@ -24,7 +24,7 @@ typedef struct {
 	int counter;
 } Handler;
 
-int deQueuer(Handler *self);
+int deQueuer(Handler *self, int dir);
 int readValue(Handler *self, int value);
 int reduceBridge(Handler *self);
 int switcher (Handler *self);

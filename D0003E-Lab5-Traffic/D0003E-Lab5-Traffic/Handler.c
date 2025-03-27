@@ -23,17 +23,15 @@ int reduceBridge(Handler *self) {
 	ASYNC(self, updateDisplay, NULL);
 }
 
-int deQueuer(Handler *self){
-	if (self->isNorth){
+int deQueuer(Handler *self, int dir){
+	if (dir){
 		self->northQueue--;
-		self->onBridge++;
-		ASYNC(self, updateDisplay, NULL);
 	}
 	else{
 		self->southQueue--;
-		self->onBridge++;
-		ASYNC(self, updateDisplay, NULL);
 	}
+	self->onBridge++;
+	ASYNC(self, updateDisplay, NULL);
 	AFTER(MSEC(5000), self, reduceBridge, NULL);
 }
 
@@ -43,14 +41,14 @@ int readValue(Handler *self, int value) {
 	}
 	if (value == 2) {			// Car enters north
 		self->counter++;
-		ASYNC(self, deQueuer, NULL);
+		ASYNC(self, deQueuer, 1);
 	}
 	if (value == 4) {
 		self->southQueue++;
 	}
 	if (value == 8) {
 		self->counter++;		
-		ASYNC(self, deQueuer, NULL);
+		ASYNC(self, deQueuer, 0);
 	}
 	ASYNC(self, updateDisplay, NULL);
 	ASYNC(self, switcher, NULL);
@@ -67,7 +65,7 @@ int switcher (Handler *self) {
 				self->isNorth = 0;
 				ASYNC(self->com, transmit, 0b0110);		// Green south
 			}
-			if (!(self->southQueue) && self->counter >= 5 && self->onBridge < 5 /*&& self->northQueue*/){
+			if (!(self->southQueue) && self->counter == 5 && self->onBridge < 5){
 				self->counter--;
 				ASYNC(self->com, transmit, 0b1001);		// Green north
 			}
@@ -75,7 +73,7 @@ int switcher (Handler *self) {
 				if (test) {
 					ABORT(test);
 				}
-				test = AFTER(MSEC(1000), self, switcher, NULL);
+				test = AFTER(MSEC(1250), self, switcher, NULL);
 			}
 		}
 	}
@@ -87,9 +85,9 @@ int switcher (Handler *self) {
 			if (self->northQueue && self->onBridge == 0) {
 				self->counter = 0;
 				self->isNorth = 1;
-				ASYNC(self->com, transmit, 0b1001);		// Green north
+				ASYNC(self->com, transmit, 0b1001);		// Green north 
 			}
-			if (!(self->northQueue) && self->counter >= 5 && self->onBridge < 5 /*&& self->southQueue*/){
+			if (!(self->northQueue) && self->counter == 5 && self->onBridge < 5){
 				self->counter--;
 				ASYNC(self->com, transmit, 0b0110);		// Green south
 			}
@@ -97,7 +95,7 @@ int switcher (Handler *self) {
 				if (test) {
 					ABORT(test);
 				}
-				test = AFTER(MSEC(1000), self, switcher, NULL);
+				test = AFTER(MSEC(1250), self, switcher, NULL);
 			}
 		}
 	}
