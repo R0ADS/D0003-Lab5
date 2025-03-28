@@ -10,6 +10,8 @@
 
 // Simply calls readvalue. (We want this seperate object since multiple interrupts can happen in short proximity or simultaneously)
 int interrupter(InterruptHandler *self) {
+	
+	//AFTER(MSEC(1000), self->handler, readValue, UDR0);
 	ASYNC(self->handler, readValue, UDR0);
 	return 0;
 }

@@ -12,6 +12,10 @@
 Msg test;
 Msg teste;
 
+int Temp(Handler *self, int value) {
+	AFTER(MSEC(1000), self, readValue, value);
+}
+
 // Displays our three variables on corresponding segments
 int updateDisplay(Handler *self) {
 	ASYNC(self->lcd, printAt, self->northQueue * 10);
@@ -35,6 +39,7 @@ int deQueuer(Handler *self, int dir){
 	}
 	self->onBridge++;
 	//ASYNC(self, updateDisplay, NULL);	// <-- Unnecessary line? Should remove and test
+	ASYNC(self, updateDisplay, NULL);
 	AFTER(MSEC(5000), self, reduceBridge, NULL);
 }
 
@@ -54,7 +59,6 @@ int readValue(Handler *self, int value) {
 		self->counter++;		
 		ASYNC(self, deQueuer, 0);
 	}
-	ASYNC(self, updateDisplay, NULL);
 	ASYNC(self, switcher, NULL);
 }
 
@@ -70,7 +74,7 @@ int switcher (Handler *self) {
 				self->isNorth = 0;
 				ASYNC(self->com, transmit, 0b0110);			// Green south
 			}
-			if (!(self->southQueue) && self->counter == 5 && self->onBridge < 5) {
+			if (!(self->southQueue) && self->counter >= 5 && self->onBridge < 5) {
 				self->counter--;
 				ASYNC(self->com, transmit, 0b1001);			// Green north
 			}
@@ -82,7 +86,7 @@ int switcher (Handler *self) {
 			}
 		}
 	}
-	else {
+	else if (!(self->isNorth)){
 		if (self->southQueue && self->counter < 5) {
 			ASYNC(self->com, transmit, 0b0110);				// Green south
 		}
@@ -92,7 +96,7 @@ int switcher (Handler *self) {
 				self->isNorth = 1;
 				ASYNC(self->com, transmit, 0b1001);			// Green north 
 			}
-			if (!(self->northQueue) && self->counter == 5 && self->onBridge < 5) {
+			if (!(self->northQueue) && self->counter >= 5 && self->onBridge < 5) {
 				self->counter--;
 				ASYNC(self->com, transmit, 0b0110);			// Green south
 			}

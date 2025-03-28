@@ -24,11 +24,13 @@ typedef struct {
 	int counter;
 } Handler;
 
+int Temp(Handler *self, int value);
 int deQueuer(Handler *self, int dir);
 int readValue(Handler *self, int value);
 int reduceBridge(Handler *self);
 int switcher (Handler *self);
 int updateDisplay(Handler *self);
+
 
 #define initHandler(com, lcd) {initObject(), com, lcd, 1, 0, 0, 0, 0}
 

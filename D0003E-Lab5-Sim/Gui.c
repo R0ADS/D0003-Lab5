@@ -13,7 +13,9 @@ void *sleepDeprived(void *t){
     Gui *sim = (Gui *)t;
     sleep(5);
     pthread_mutex_lock(&guiMutex);
-    sim->onBridge--;
+    if (sim->onBridge != 0){
+        sim->onBridge--;
+    }
     pthread_mutex_unlock(&guiMutex);
     printMe(sim);
     pthread_exit(NULL);
@@ -42,6 +44,7 @@ int inputRead(int serial_port, Gui *sim) {
     uint8_t NORTH = 0b0001;
     /*Thread *ts = (Thread*)t;
     Gui *sim = (Gui *)ts->Sim;*/
+    pthread_mutex_lock(&guiMutex);
     char input;
     scanf("%c", &input);
     switch (input) {
@@ -62,6 +65,8 @@ int inputRead(int serial_port, Gui *sim) {
         default:
             break;
     }
+    pthread_mutex_unlock(&guiMutex);
+    printMe(sim);
     return 1;
 }
 
@@ -71,8 +76,8 @@ void menu(void *t) {
     Gui *sim = (Gui *)ts->Sim;
     while (on) {
         on = inputRead(ts->serial_port, sim);
-        printMe(sim);
-        sleep(0.1);
+        //printMe(sim);
+        sleep(0.01);
     }
 }
 
@@ -85,14 +90,18 @@ void theProcess(int serial_port, Gui *sim) {
     pthread_mutex_lock(&guiMutex);
     if (sim->northLight && !(sim->southLight) && sim->northQueue) {
         sim->northQueue--;
+        sim->onBridge++;
+        //sleep(1);       // Drive on delay
         write(serial_port, &NORTHDEQ, 1);
     }
-    else if (!(sim->northLight) && (sim->southLight) && sim->southQueue) {
+    if (!(sim->northLight) && (sim->southLight) && sim->southQueue) {
         sim->southQueue--;
+        sim->onBridge++;
+        //sleep(1);       // Drive on delay
         write(serial_port, &SOUTHDEQ, 1);
     }
-    sim->onBridge++;
     pthread_mutex_unlock(&guiMutex);
+    printMe(sim);
     pthread_create(&carRemover, NULL, sleepDeprived, sim);
 }
 
@@ -117,3 +126,10 @@ void handleInput(void *t, uint8_t data) {
     theProcess(ts->serial_port, sim);
 }
 
+/*
+Om bil samma riktning {
+    delay 1 sekund
+}
+
+borde funka varje gång 
+*/
